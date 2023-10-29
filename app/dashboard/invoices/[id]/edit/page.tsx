@@ -8,7 +8,7 @@ export default async function Page({ params }: { params: { id: string } }) {
   const invoice = await fetchInvoiceById(id);
   const customers = await fetchCustomers();
 
-  if(!invoice) {
+  if (!invoice) {
     notFound();
   }
 
@@ -17,11 +17,7 @@ export default async function Page({ params }: { params: { id: string } }) {
       <Breadcrumbs
         breadcrumbs={[
           { label: 'Invoices', href: '/dashboard/invoices' },
-          {
-            label: 'Edit Invoice',
-            href: `/dashboard/invoices/${id}/edit`,
-            active: true,
-          },
+          { label: 'Edit Invoice', href: `/dashboard/invoices/${id}/edit`, active: true },
         ]}
       />
       <Form invoice={invoice} customers={customers} />
