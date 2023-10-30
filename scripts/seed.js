@@ -23,16 +23,17 @@ async function seedUsers() {
     console.log(`Created "users" table`);
 
     // Insert data into the "users" table
-    const insertedUsers = await Promise.all(
-      users.map(async (user) => {
-        const hashedPassword = await bcrypt.hash(user.password, 10);
-        return sql`
+    const insertedUsers = [];
+    for (const user of users) {
+      const hashedPassword = await bcrypt.hash(user.password, 10);
+      insertedUsers.push(
+        await sql`
         INSERT INTO users (id, name, email, password)
         VALUES (${user.id}, ${user.name}, ${user.email}, ${hashedPassword})
         ON CONFLICT (id) DO NOTHING;
-      `;
-      }),
-    );
+      `,
+      );
+    }
 
     console.log(`Seeded ${insertedUsers.length} users`);
 
@@ -64,15 +65,16 @@ async function seedInvoices() {
     console.log(`Created "invoices" table`);
 
     // Insert data into the "invoices" table
-    const insertedInvoices = await Promise.all(
-      invoices.map(
-        (invoice) => sql`
+    const insertedInvoices = [];
+    for (const invoice of invoices) {
+      insertedInvoices.push(
+        await sql`
         INSERT INTO invoices (customer_id, amount, status, date)
         VALUES (${invoice.customer_id}, ${invoice.amount}, ${invoice.status}, ${invoice.date})
         ON CONFLICT (id) DO NOTHING;
       `,
-      ),
-    );
+      );
+    }
 
     console.log(`Seeded ${insertedInvoices.length} invoices`);
 
@@ -103,15 +105,15 @@ async function seedCustomers() {
     console.log(`Created "customers" table`);
 
     // Insert data into the "customers" table
-    const insertedCustomers = await Promise.all(
-      customers.map(
-        (customer) => sql`
+    const insertedCustomers = [];
+    for (const customer of customers) {
+      insertedCustomers.push(
+        await sql`
         INSERT INTO customers (id, name, email, image_url)
         VALUES (${customer.id}, ${customer.name}, ${customer.email}, ${customer.image_url})
-        ON CONFLICT (id) DO NOTHING;
-      `,
-      ),
-    );
+        ON CONFLICT (id) DO NOTHING;`,
+      );
+    }
 
     console.log(`Seeded ${insertedCustomers.length} customers`);
 
@@ -138,22 +140,20 @@ async function seedRevenue() {
     console.log(`Created "revenue" table`);
 
     // Insert data into the "revenue" table
-    const insertedRevenue = await Promise.all(
-      revenue.map(
-        (rev) => sql`
+    const insertedRevenue = [];
+    for (const rev of revenue) {
+      insertedRevenue.push(
+        await sql`
         INSERT INTO revenue (month, revenue)
         VALUES (${rev.month}, ${rev.revenue})
         ON CONFLICT (month) DO NOTHING;
       `,
-      ),
-    );
+      );
+    }
 
     console.log(`Seeded ${insertedRevenue.length} revenue`);
 
-    return {
-      createTable,
-      revenue: insertedRevenue,
-    };
+    return { createTable, revenue: insertedRevenue };
   } catch (error) {
     console.error('Error seeding revenue:', error);
     throw error;
